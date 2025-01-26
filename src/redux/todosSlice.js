@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addTodo, deleteTodo, fetchAllTodos } from './todosOps';
+import { addTodo, deleteTodo, editTodo, fetchAllTodos } from './todosOps';
 
 const initialState = {
   items: [],
   isLoading: false,
   error: null,
+  currentTodo: null,
 };
 
 /* const slice = createSlice({
@@ -16,7 +17,11 @@ const initialState = {
 export const todosSlice = createSlice({
   name: 'todos',
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentTodo(state, action) {
+      state.currentTodo = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(addTodo.pending, state => {
@@ -56,14 +61,33 @@ export const todosSlice = createSlice({
       .addCase(fetchAllTodos.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(editTodo.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(editTodo.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const index = state.items.findIndex(item => {
+          return item.id === action.payload.id;
+        });
+        state.items.splice(index, 1, action.payload);
+        state.currentTodo = null;
+      })
+      .addCase(editTodo.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 
-  selectors: { selectTodos: sliceState => sliceState.items },
+  selectors: {
+    selectTodos: sliceState => sliceState.items,
+    selectCurrentTodo: sliceState => sliceState.currentTodo,
+  },
 });
 
 //export default slice.reducer
 
 //const selectTodos = (state) => state.todos.items
-
-export const { selectTodos } = todosSlice.selectors;
+export const { setCurrentTodo } = todosSlice.actions;
+export const { selectTodos, selectCurrentTodo } = todosSlice.selectors;

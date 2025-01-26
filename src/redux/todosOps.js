@@ -41,3 +41,16 @@ export const deleteTodo = createAsyncThunk(
     }
   },
 );
+
+export const editTodo = createAsyncThunk(
+  'todos/editTodo',
+  async (body, thunkAPI) => {
+    try {
+      const responce = await axios.put(`/todos/${body.id}`, body);
+      return responce.data;
+    } catch (error) {
+      console.log(error);
+      return thunkAPI.rejectWithValue('Something went wrong!');
+    }
+  },
+);
