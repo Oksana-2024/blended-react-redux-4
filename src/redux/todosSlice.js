@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addTodo, deleteTodo } from './todosOps';
+import { addTodo, deleteTodo, fetchAllTodos } from './todosOps';
 
 const initialState = {
   items: [],
@@ -42,6 +42,18 @@ export const todosSlice = createSlice({
         });
       })
       .addCase(deleteTodo.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchAllTodos.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllTodos.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.items = action.payload;
+      })
+      .addCase(fetchAllTodos.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
