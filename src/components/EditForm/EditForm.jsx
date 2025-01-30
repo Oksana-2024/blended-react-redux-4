@@ -5,10 +5,16 @@ import style from './EditForm.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectCurrentTodo, setCurrentTodo } from '../../redux/todosSlice';
 import { editTodo } from '../../redux/todosOps';
+import { useEffect, useState } from 'react';
 
 const EditForm = () => {
   const dispatch = useDispatch();
-  const currentTodo = useSelector(selectCurrentTodo);
+  const currentTodo = useSelector(selectCurrentTodo);// початковий стан(або новий стан)
+  const [text, setText] = useState(currentTodo?.text || ''); //стан для редагування
+  //слідкуємо за зміною currentTodo
+  useEffect(() => {
+    setText(currentTodo.text);
+  }, [currentTodo]);
 
   const handleSubmit = async e => {
     try {
@@ -29,13 +35,16 @@ const EditForm = () => {
         placeholder="What do you want to write?"
         name="search"
         required
-        defaultValue={currentTodo.text}
+       // defaultValue={currentTodo.text} *замінили на value і onChange
+       //прикожній зміні значення input.value оновлюємо text
+        value={text}
+        onChange={e => setText(e.target.value)}
         autoFocus
       />
+
       <button className={style.submitButton} type="submit">
         <RiSaveLine color="green" size="16px" />
       </button>
-
       <button
         className={style.editButton}
         type="button"
